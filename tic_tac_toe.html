@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stylish Tic Tac Toe</title>
+  <link
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .game-container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .cell {
+      border: 2px solid #333;
+      height: 100px;
+      font-size: 2.5em;
+      text-align: center;
+      line-height: 100px; 
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+      background-color: #fff;
+    }
+
+    .cell:hover {
+      background-color: #f8f9fa;
+      transform: scale(1.05);
+    }
+    .cell.filled {
+      animation: popIn 0.3s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    #status {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container game-container text-center">
+    <h1>Tic Tac Toe</h1>
+    <div id="status">Player X's turn</div>
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="row no-gutters">
+          <div class="col-4 cell" data-index="0"></div>
+          <div class="col-4 cell" data-index="1"></div>
+          <div class="col-4 cell" data-index="2"></div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-4 cell" data-index="3"></div>
+          <div class="col-4 cell" data-index="4"></div>
+          <div class="col-4 cell" data-index="5"></div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-4 cell" data-index="6"></div>
+          <div class="col-4 cell" data-index="7"></div>
+          <div class="col-4 cell" data-index="8"></div>
+        </div>
+      </div>
+    </div>
+    <button id="restart" class="btn btn-primary mt-4 px-4 py-2">Restart Game</button>
+  </div>
+
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const statusDiv = document.getElementById('status');
+    const restartButton = document.getElementById('restart');
+    let board = ["", "", "", "", "", "", "", "", ""];
+    // Current player ('X' starts)
+    let currentPlayer = "X";
+    
+    let gameActive = true;
+    const winningConditions = [
+      [0, 1, 2], 
+      [3, 4, 5], 
+      [6, 7, 8], 
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8], 
+      [0, 4, 8],
+      [2, 4, 6]  
+    ];
+
+    function handleCellClick(event) {
+      // when cell elemnt is clicked
+      const clickedCell = event.target;
+      const cellIndex = clickedCell.getAttribute('data-index');
+      if (board[cellIndex] !== "" || !gameActive) {
+        return;
+      }
+      board[cellIndex] = currentPlayer;
+      clickedCell.textContent = currentPlayer;
+      clickedCell.classList.add('filled');
+
+      // Check everytime  if the move caused a win
+      if (checkWin()) {
+        statusDiv.textContent = `Player ${currentPlayer} wins!`;
+        gameActive = false;
+        return;
+      }
+
+      if (board.every(cell => cell !== "")) {
+        statusDiv.textContent = "It's a draw!";
+        gameActive = false;
+        return;
+      }
+
+      // Switch  player 
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+    }
+    function checkWin() {
+      return winningConditions.some(condition => {
+        const [a, b, c] = condition;
+        return board[a] === currentPlayer &&
+               board[b] === currentPlayer &&
+               board[c] === currentPlayer;
+      });
+    }
+    function restartGame() {
+      board = ["", "", "", "", "", "", "", "", ""];
+      gameActive = true;
+      currentPlayer = "X";
+      cells.forEach(cell => {
+        cell.textContent = "";
+        cell.classList.remove('filled');
+      });
+      // Reset the status message
+      statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+    }
+    cells.forEach(cell => {
+      cell.addEventListener('click', handleCellClick);
+    });
+
+    // Add a click event listener to the restart button
+    restartButton.addEventListener('click', restartGame);
+  </script>>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
