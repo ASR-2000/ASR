@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice-to-Text Converter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h2 {
+            color: #333;
+            font-weight: 600;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-top: 15px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            background: #f8f9fa;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 120px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+        .start { background: #28a745; color: white; }
+        .stop { background: #dc3545; color: white; }
+        .reset { background: #ffc107; color: black; }
+        .copy { background: #007bff; color: white; }
+        button:hover { opacity: 0.85; transform: scale(1.1); }
+        
+        /* Floating Microphone Animation */
+        .mic-icon {
+            font-size: 50px;
+            color: #dc3545;
+            animation: bounce 1.5s infinite ease-in-out;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="mic-icon">🎤</span>
+        <h2>Voice-to-Text Converter</h2>
+        <textarea id="text" placeholder="Your speech will appear here..."></textarea>
+        <div class="btn-container">
+            <button class="start" onclick="startRecognition()">Start</button>
+            <button class="stop" onclick="stopRecognition()">Stop</button>
+            <button class="reset" onclick="resetText()">Reset</button>
+            <button class="copy" onclick="copyText()">Copy</button>
+        </div>
+    </div>
+    <script>
+        let recognition;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => console.log("Speech recognition started");
+            recognition.onend = () => console.log("Speech recognition ended");
+            recognition.onerror = (event) => console.error("Speech recognition error:", event);
+            
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript + ' ';
+                }
+                document.getElementById('text').value = transcript.trim();
+                console.log("Captured speech:", transcript);
+            };
+        } else {
+            alert('Speech Recognition API is not supported in your browser. Please use Google Chrome.');
+        }
+
+        function startRecognition() {
+            if (recognition) {
+                recognition.start();
+            }
+        }
+
+        function stopRecognition() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        function resetText() {
+            document.getElementById('text').value = '';
+        }
+
+        function copyText() {
+            let textArea = document.getElementById('text');
+            textArea.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
